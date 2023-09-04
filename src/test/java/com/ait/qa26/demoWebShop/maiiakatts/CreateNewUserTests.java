@@ -2,45 +2,40 @@ package com.ait.qa26.demoWebShop.maiiakatts;
 
 import org.openqa.selenium.By;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.concurrent.TimeUnit;
 
 public class CreateNewUserTests extends TestBase {
 
+    //we need condition of entrance to the site!
+    @BeforeMethod
+    public void ensurePrecondition() {
+        //user should be logged out
+        if (!isElementPresent(By.xpath("//a[contains(.,'Log in')]"))) {
+            click(By.xpath("//a[contains(text(),'Log out')]"));
+        }
+        click(By.xpath("//a[contains(.,'Log in')]"));
+    }
+
     @Test
-    public void createNewUserPositiveTest(){
+    public void createExistedUserNegativeTest() {
 
-        driver.findElement(By.xpath("//a[contains(.,'Register')]")).click();
-        driver.findElement(By.id("gender-male")).click();
-        driver.findElement(By.id("gender-female")).click();
+        System.out.println(
+                "***** Start to create existed user negative test *****"
+        );
+        click(By.xpath("//a[contains(.,'Register')]"));
+        click(By.id("gender-male"));
+        click(By.id("gender-female"));
 
-        driver.findElement(By.id("FirstName")).click();
-        driver.findElement(By.id("FirstName")).clear();
-        driver.findElement(By.id("FirstName")).sendKeys("Maiia");
+        type(By.id("FirstName"), "Maiia");
+        type(By.id("LastName"), "Katts");
+        type(By.id("Email"), "qwertymaiia@gmail.com");
+        type(By.id("Password"), "qwertymaiia123$");
+        type(By.id("ConfirmPassword"), "qwertymaiia123$");
 
-        driver.findElement(By.id("LastName")).click();
-        driver.findElement(By.id("LastName")).clear();
-        driver.findElement(By.id("LastName")).sendKeys("Katts");
-
-        driver.findElement(By.id("Email")).click();
-        driver.findElement(By.id("Email")).clear();
-        driver.findElement(By.id("Email")).sendKeys("qwertymaiia@gmail.com");
-
-        driver.findElement(By.id("Password")).click();
-        driver.findElement(By.id("Password")).clear();
-        driver.findElement(By.id("Password")).sendKeys("qwertymaiia123$");
-
-        driver.findElement(By.id("ConfirmPassword")).click();
-        driver.findElement(By.id("ConfirmPassword")).clear();
-        driver.findElement(By.id("ConfirmPassword")).sendKeys("qwertymaiia123$");
-
-        driver.findElement(By.name("register-button")).click();
-        String expectedText = "qwertymaiia@gmail.com";
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        String actualText = driver.findElement(By.cssSelector("#Email")).getAttribute("value");
-        Assert.assertEquals(actualText, expectedText);
-
+        click(By.name("register-button"));
+        Assert.assertTrue(isElementPresent(By.
+                cssSelector(".validation-summary-errors li")),
+                "The specified email already exists");
     }
 }
-
